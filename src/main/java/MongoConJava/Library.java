@@ -35,27 +35,14 @@ public class Library {
 		database = mongoClient.getDB("MongoDBTutorial");
 		test = database.getCollection("test");
 		
-		/*TestObj testObj = new TestObj();
-		testObj.setMemberId(memberId);
-		testObj.setTimer(timer);
-		testObj.setXP(xp);*/
-		
 		// Step 1 : Query mongo for players and board (using Pat and Frank for now)
 		DBObject query = new BasicDBObject("player1", nameOfPlayer1).append("player2", nameOfPlayer2);
 		DBCursor cursor = test.find(query);
 		String objID = "";
 		if(cursor.one() != null) {
-			//DBObject myReturn = cursor.one();
 			objID = cursor.one().get("_id").toString();
 		}
-		//BSON bson = new BSON();
 		Gson gson = new Gson();
-		
-		// the following works
-		/*BasicDBObject obj1 = (BasicDBObject)JSON.parse(gson.toJson(nameOfPlayer1));
-		BasicDBObject obj2 = (BasicDBObject)JSON.parse(gson.toJson(nameOfPlayer2));
-		DBObject chessObj = new BasicDBObject("nameOfPlayer1", obj1).append("nameOfPlayer2", obj2);*/
-				//.append("chessBoard", chessBoard);
 		
 		Map<String, DBObject> objMap = new HashMap<String, DBObject>();
 		Iterator<Map.Entry<String, Object>> it = chessBoard.entrySet().iterator();
@@ -64,44 +51,25 @@ public class Library {
 			BasicDBObject myObj = (BasicDBObject)JSON.parse(gson.toJson(local_it.getValue()));
 			objMap.put(local_it.getKey(), myObj);
 		}
-		//map.put("1", "Department A");
-		//map.put("2", "Depar tment B");
-		//collection.insert(new BasicDBObject(map));
 		
-		//Object nameOfPlayer1 = new Object();
-		//nameOfPlayer1 = timer;
-		
-		//test.insert(convert(testObj));
-		// below is working
-		//test.insert(chessObj);
-		//test.insert(new BasicDBObject(objMap));
 		DBObject thingamajig = new BasicDBObject(objMap)
 								.append("player1", nameOfPlayer1)
 								.append("player2", nameOfPlayer2);
 		
 		if(!objID.isEmpty()) {
-			//objID = "\"" + objID + "\"";
-			//objID = "ObjectId(" + objID + ")";
 			thingamajig.put("_id", new ObjectId(objID));
 		}
 		test.save(thingamajig);
-		
-		//DBObject query = new BasicDBObject("XP", 1234);
-		//DBObject query = new BasicDBObject("_id", new ObjectId("62c725d05ed3442e8a6a22a7"));
-		//DBObject query = new BasicDBObject("player1", "Pat").append("player2", "Frank");
-		//DBCursor cursor = test.find(query);
-		
-		//DBObject update = new BasicDBObject("$set", new BasicDBObject("B7.rank", 2)); 
-		//DBCursor cursor = test.findAndModify()
-        //DBObject result = test.findAndModify(query, null, null, false, update, true, true);
 		System.out.println(cursor.one()); // this is null if not in db
 		
 		
 	}
+	
 	public static DBObject convert(TestObj testObj) {
 		return new BasicDBObject("XP", testObj.getXP()).append("Timer", testObj.getTimer())
 				.append("memberID", testObj.getMemberId());
 	}
+	
 	public static Map<String, ZywickSpecial> refrain(Object nameOfPlayer1, Object nameOfPlayer2) throws UnknownHostException {
 		mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
 		database = mongoClient.getDB("MongoDBTutorial");
@@ -111,63 +79,20 @@ public class Library {
 		DBCursor cursor = test.find(query);
 		
 		Gson gson = new Gson();
-		//if(cursor.one() != null) {
-			//DBObject myReturn = cursor.one();
-			//String myChessBoardId = cursor.one().get("_id").toString();
-			//String randomPieceJSON = cursor.one().get("D8").toString();
-			Map<String, ZywickSpecial> testBoard = new HashMap<>();
-			Set<String> myKeys = cursor.one().keySet();
-			//@SuppressWarnings("unchecked")
-			//Map<String, Object> myExpMap = cursor.one().toMap();
-			/*
-			 * Type listType = new TypeToken<ArrayList<KeyPairBoolData>>() {
-                    }.getType();
-List<KeyPairBoolData> keyPairBoolDataList = new Gson().fromJson(jsonArray, listType);
-			 */
-			Type pwzType = new TypeToken<ZywickSpecial>() {}.getType();
-			String randomPieceJSON = "";
-			for(String key : myKeys) {
-				if(key.equals("_id") || key.equals("player1") || key.equals("player2")) {
-					continue;
-				}
-				randomPieceJSON = cursor.one().get(key).toString();
-				ZywickSpecial pwzSpec = gson.fromJson(randomPieceJSON, pwzType);
-				testBoard.put(new String(key), new ZywickSpecial(pwzSpec));
+		
+		Map<String, ZywickSpecial> testBoard = new HashMap<>();
+		Set<String> myKeys = cursor.one().keySet();
+		Type pwzType = new TypeToken<ZywickSpecial>() {}.getType();
+		String randomPieceJSON = "";
+		for(String key : myKeys) {
+			if(key.equals("_id") || key.equals("player1") || key.equals("player2")) {
+				continue;
 			}
-			
-			//Map<String, Object> myChessBoard = new HashMap<String, Object>();
-			
-			//ArrayList<?> myPiece = gson.fromJson(randomPieceJSON, ArrayList.class);
-			//Object tackle = myPiece.get(0);
-			//myChessBoard.put("D8", myPiece);
-			// so we will work with Map<String, ArrayList<?>> and see if we can't take left/right of "=" signs
-			
-			// looping over the map
-			/*Iterator<Map.Entry<String, Object>> it = myChessBoard.entrySet().iterator();
-			while(it.hasNext()) {
-				Map.Entry<String, Object> local_it = it.next();
-				String myStr = local_it.getKey();
-				Object myObj = local_it.getValue();
-				System.out.println("HOLD UP");
-			}*/
-			
-			//for(ZywickSpecial lilZywick : pwzList) {
-				/*System.out.println(pwzSpec.rank);
-				System.out.println(pwzSpec.name);
-				System.out.println(pwzSpec.isInitialMove);*/
-			//}
-			//testBoard.put("D8", pwzSpec);
-			//myChessBoard.get("D8");
-			
-			//return myChessBoard;
-			return testBoard;
-			//Set<?> mySet = myTreeMap.keySet();
-			//Iterator<Map.Entry<?, ?>> it =  myPiece.entrySet().iterator();
-			/*while(it.hasNext()) {
-				Object local_it = it.next();
-				System.out.println(local_it.)
-			}*/
-			
-		//}
+			randomPieceJSON = cursor.one().get(key).toString();
+			ZywickSpecial pwzSpec = gson.fromJson(randomPieceJSON, pwzType);
+			testBoard.put(new String(key), new ZywickSpecial(pwzSpec));
+		}
+		
+		return testBoard;
 	}
 }
